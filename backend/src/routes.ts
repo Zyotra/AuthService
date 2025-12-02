@@ -7,14 +7,12 @@ const routes:apiRoute[]=[
         path:"/login",
         method:"post",
         handler:loginController,
-        middlewares:[()=>{}],
         isProtected:false
     },
     {
         path:"/register",
         method:"post",
         handler:registerController,
-        middlewares:[()=>{}],
         isProtected:false
     }
 ]

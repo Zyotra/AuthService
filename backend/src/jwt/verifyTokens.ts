@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 import { db } from "../db/client";
 import { login_Sessions } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { status } from "elysia";
 
 export const verifyAccessToken=async (token:string):Promise<boolean | any>=>{
     try {
