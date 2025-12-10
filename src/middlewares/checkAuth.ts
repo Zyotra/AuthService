@@ -20,7 +20,7 @@ const checkAuth = new Elysia().derive(async ({ headers, set,cookie }: Context) =
     const isValid = await verifyAccessToken(token)
     console.log("Token verification result:", isValid);
     if (!isValid) {
-        set.status = StatusCode.UNAUTHORIZED
+        set.status = StatusCode.EXPIRED_TOKEN
         return {
             message: "Invalid Access Token"
         }

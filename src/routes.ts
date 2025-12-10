@@ -1,6 +1,7 @@
 import dashboardController from "./controllers/auth/dashboardController";
 import loginController from "./controllers/auth/loginController";
 import registerController from "./controllers/auth/registerController";
+import getAccessTokenController from "./controllers/getAccessTokenController";
 import { apiRoute } from "./types/types";
 
 const routes:apiRoute[]=[
@@ -20,6 +21,11 @@ const routes:apiRoute[]=[
         method:"get",
         handler:dashboardController,
         isProtected:true
+    },{
+        path:"/get-access-token",
+        method:"get",
+        handler:getAccessTokenController,
+        isProtected:false
     }
 ]
 export default routes

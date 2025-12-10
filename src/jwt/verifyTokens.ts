@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { db } from "../db/client";
 import { login_Sessions } from "../db/schema";
 import { eq } from "drizzle-orm";
+import { status } from "elysia";
 
 export const verifyAccessToken = async (token: string)=> {
     try {
@@ -12,7 +13,7 @@ export const verifyAccessToken = async (token: string)=> {
         return false;
     }
 }
-export const verifyRefreshToken=async (token:string):Promise<boolean>=>{
+export const verifyRefreshToken=async (token:string):Promise<boolean | any>=>{
     try {
         const user=jwt.verify(token,process.env.REFRESH_TOKEN_SECRET as string) as {userId:string};
         console.log("User decoded from refresh token:", user);
@@ -21,7 +22,10 @@ export const verifyRefreshToken=async (token:string):Promise<boolean>=>{
         if(tokenFound[0].expiresAt < new Date()) return false;
         if(tokenFound[0].refreshToken !== token) return false;
         if(!tokenFound[0]) return false;
-        return true;
+        return {
+            status: true,
+            userId: user.userId
+        };
     } catch (error) {
         return false;
     }
