@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { StatusCode } from "../../types/types";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "../../jwt/generateTokens";
-const loginController = async ({ body, set }: Context) => {
+const loginController = async ({ body, set, cookie }: Context) => {
     const { email, password } = body as { email: string, password: string };
     try {
         const user = await db.select().from(users).where(eq(users.email, email));
@@ -18,10 +18,23 @@ const loginController = async ({ body, set }: Context) => {
             set.status = StatusCode.FORBIDDEN;
             return { message: "Invalid email or password" };
         }
-        const accessToken=await generateAccessToken(user[0].id.toString());
-        const refreshToken=await generateRefreshToken(user[0].id.toString());
+        const accessToken = await generateAccessToken(user[0].id.toString());
+        const refreshToken = await generateRefreshToken(user[0].id.toString());
+        cookie.refreshToken.set({
+            value: refreshToken,
+            httpOnly: true,       // Prevents JS access (XSS protection)
+            sameSite: 'strict',   // CSRF protection
+            path: '/',            // Available for all paths
+            maxAge: 15 * 24 * 60 * 60, // 15 days (in seconds)
+        });
+        cookie.accessToken.set({
+            value: accessToken,
+            httpOnly: true,
+            sameSite: 'strict',
+            maxAge: 15 * 60, // 15 minutes
+        });
         set.status = StatusCode.OK;
-        return { message: "Login successful", userId: user[0].id, accessToken, refreshToken };
+        return { message: "Login successful",userId: user[0].id,accessToken};
     } catch (error) {
         set.status = StatusCode.INTERNAL_SERVER_ERROR;
         return { message: "An error occurred during login" };

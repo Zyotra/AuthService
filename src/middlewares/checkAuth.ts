@@ -2,15 +2,20 @@ import Elysia, { Context } from "elysia";
 import { verifyAccessToken } from "../jwt/verifyTokens";
 import { StatusCode } from "../types/types";
 
-const checkAuth = new Elysia().derive(async ({ headers, set }: Context) => {
+const checkAuth = new Elysia().derive(async ({ headers, set,cookie }: Context) => {
     const authHeader=headers['authorization'];
-    if(!authHeader){
+    var token:string="";
+    if(authHeader){
+        token=authHeader.split(' ')[1];
+    }else{
+        token=cookie.refreshToken.value as string;
+    }
+    if(!token){
         set.status = StatusCode.UNAUTHORIZED
         return {
-            message: "Missing Authorization Header"
+            message: "No token provided"
         }
     }
-    const token= authHeader.split(' ')[1];
     console.log("Verifying token:", token);
     const isValid = await verifyAccessToken(token)
     console.log("Token verification result:", isValid);
