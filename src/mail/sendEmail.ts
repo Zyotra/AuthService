@@ -1,0 +1,55 @@
+import nodemailer, { Transporter } from "nodemailer";
+import generateOtpEmailContent from "./getEmailContent";
+import { db } from "../db/client";
+import { otps } from "../db/schema";
+import generateOtp from "./generateOtp";
+
+interface SendEmailOptions {
+  to: string;
+}
+
+let transporter: Transporter;
+
+function getTransporter(): Transporter {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,        // e.g., "smtp.gmail.com"
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,                      // true if using port 465
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+  return transporter;
+}      
+
+export async function sendEmail({
+  to,
+}: SendEmailOptions): Promise<void> {
+  try {
+    const emailTransporter = getTransporter();
+    const from = process.env.SMTP_USER;
+
+    if (!from) {
+      throw new Error("SMTP_USER is not defined in environment variables");
+    }
+    const otp=generateOtp()
+    await emailTransporter.sendMail({
+      to,
+      from,
+      subject:"Zyotra Verification Email",
+      html: generateOtpEmailContent(otp),
+    });
+    console.log(`Email sent to ${to}`);
+    await db.insert(otps).values({
+        email: to,
+        otp: otp
+    })
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw error;
+  }
+}
+export default sendEmail;

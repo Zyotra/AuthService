@@ -16,11 +16,13 @@
     "@elysiajs/cors": "^1.4.0",
     "@types/cors": "^2.8.19",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/nodemailer": "^7.0.4",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.44.7",
     "elysia": "latest",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.11",
     "postgres": "^3.4.7"
   },
   "devDependencies": {

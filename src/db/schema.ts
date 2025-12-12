@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { pgTable, serial, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
@@ -15,4 +16,15 @@ export const login_Sessions = pgTable("login_sessions", {
   refreshToken: text("token").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   expiresAt: timestamp("expires_at").notNull(),
+});
+
+export const otps= pgTable("otps", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull(),
+  otp: varchar("otp", { length: 10 }).notNull(),
+  status: varchar("status", { length: 50 }).default("pending").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at")
+    .default(sql`now() + interval '1 minute'`)
+    .notNull(),
 });
