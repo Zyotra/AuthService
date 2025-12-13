@@ -10,7 +10,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "build":"bun run db:generate && bun run db:migrate && tsc -b"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.0",
