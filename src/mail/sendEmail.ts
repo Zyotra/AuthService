@@ -18,8 +18,8 @@ function getTransporter(): Transporter {
   console.log("SMTP_PASS:", process.env.SMTP_PASS ? "defined" : "undefined");
   if (!transporter) {
     transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,        // e.g., "smtp.gmail.com"
-      port: Number(process.env.SMTP_PORT) || 587,
+      host: "smtp.gmail.com",        // e.g., "smtp.gmail.com"
+      port: 587,
       secure: false,                      // true if using port 465
       auth: {
         user: process.env.SMTP_USER,
