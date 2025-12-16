@@ -15,6 +15,7 @@ const dashboardController = async({ set,userId }: Context | any)=>{
     set.status = StatusCode.OK;
     return { message: "Welcome to the dashboard",
         userEmail: user[0].email,
+        userName: user[0].name
      };
 }
 
