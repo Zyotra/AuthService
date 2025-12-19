@@ -23,14 +23,16 @@ const loginController = async ({ body, set, cookie }: Context) => {
         cookie.refreshToken.set({
             value: refreshToken,
             httpOnly: true,       // Prevents JS access (XSS protection)
-            sameSite: 'strict',   // CSRF protection
+            sameSite: 'none',   // CSRF protection
             path: '/',            // Available for all paths
+            domain: "https://ramkrishna.cloud",
             maxAge: 15 * 24 * 60 * 60, // 15 days (in seconds)
         });
         cookie.accessToken.set({
             value: accessToken,
             httpOnly: true,
-            sameSite: 'strict',
+            sameSite: 'none',
+            domain: "https://ramkrishna.cloud",
             maxAge: 15 * 60, // 15 minutes (in seconds)
         });
         set.status = StatusCode.OK;
