@@ -6,7 +6,7 @@ import { StatusCode } from "../../types/types";
 import bcrypt from "bcryptjs";
 import { generateAccessToken, generateRefreshToken } from "../../jwt/generateTokens";
 
-const loginController = async ({ body, set }: Context) => {
+const loginController = async ({ body, set, cookie }: Context) => {
     const { email, password } = body as { email: string, password: string };
     try {
         const user = await db.select().from(users).where(eq(users.email, email));
@@ -23,40 +23,31 @@ const loginController = async ({ body, set }: Context) => {
         const accessToken = await generateAccessToken(user[0].id.toString());
         const refreshToken = await generateRefreshToken(user[0].id.toString());
         
-        const isProd = true;
-        
-        console.log('Is Production Environment:', isProd);
-        
-        // Build the response body
-        const responseBody = JSON.stringify({ 
-            message: "Login successful", 
-            userId: user[0].id, 
-            accessToken 
+        // Set cookies with explicit domain
+        cookie.refreshToken.set({
+            value: refreshToken,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            domain: 'ramkrishna.cloud',  // Try WITHOUT the leading dot
+            path: '/',
+            maxAge: 15 * 24 * 60 * 60,
+        });
+
+        cookie.accessToken.set({
+            value: accessToken,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            domain: 'ramkrishna.cloud',  // Try WITHOUT the leading dot
+            path: '/',
+            maxAge: 15 * 60,
         });
         
-        // Create headers object
-        const headers = new Headers({
-            'Content-Type': 'application/json'
-        });
+        console.log('Cookies set with domain: ramkrishna.cloud (without leading dot)');
         
-        // Append Set-Cookie headers separately (this is the correct way for multiple cookies)
-        headers.append(
-            'Set-Cookie', 
-            `refreshToken=${refreshToken}; HttpOnly; Secure; SameSite=None; Domain=.ramkrishna.cloud; Path=/; Max-Age=${15 * 24 * 60 * 60}`
-        );
-        headers.append(
-            'Set-Cookie', 
-            `accessToken=${accessToken}; HttpOnly; Secure; SameSite=None; Domain=.ramkrishna.cloud; Path=/; Max-Age=${15 * 60}`
-        );
-        
-        console.log('Setting cookies with domain .ramkrishna.cloud');
-        
-        // Return Response object
-        return new Response(responseBody, {
-            status: 200,
-            headers: headers
-        });
-        
+        set.status = StatusCode.OK;
+        return { message: "Login successful", userId: user[0].id, accessToken };
     } catch (error) {
         console.error('Login error:', error);
         set.status = StatusCode.INTERNAL_SERVER_ERROR;
