@@ -18,7 +18,7 @@ const getAccessTokenController = async ({ set, cookie }: Context) => {
         }
     }
     const userId = isValid.userId;
-    const isProd = false;
+    const isProd = true;
     const accessToken = await generateAccessToken(userId);
         cookie.accessToken.set({
             value: accessToken,

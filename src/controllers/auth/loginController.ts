@@ -45,6 +45,7 @@ const loginController = async ({ body, set, cookie }: Context) => {
         return { message: "Login successful", userId: user[0].id, accessToken };
     } catch (error) {
         set.status = StatusCode.INTERNAL_SERVER_ERROR;
+        console.error("Login Error:", error);
         return { message: "An error occurred during login" };
     }
 }
